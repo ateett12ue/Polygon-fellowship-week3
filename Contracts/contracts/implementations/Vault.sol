@@ -8,7 +8,7 @@ import "./Oracle.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 
-abstract contract Vault is IVault, Ownable {
+contract Vault is IVault, Ownable {
     mapping (address => Vault) vaults;
     StableCoinToken public token;
     PriceConsumer private oracle;
