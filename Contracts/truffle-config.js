@@ -20,7 +20,7 @@ module.exports = {
   networks: {
     development: {
       host: "127.0.0.1",     // Localhost (default: none)
-      port: 7545,            // Standard Ethereum port (default: none)
+      port: 7546,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none)
      },
     //  kovan: {
@@ -28,12 +28,18 @@ module.exports = {
     //    network_id: 42,
     //    gas: 8000000
     //  },
-     goerli: {
-      provider: () => new HDWalletProvider({ mnemonic : process.env.MNEMONIC, providerOrUrl : `https://goerli.infura.io/v3/${process.env.INFURA_APIKEY}`, addressIndex: 2}),
-      network_id: 5,
+    //  goerli: {
+    //   provider: () => new HDWalletProvider({ mnemonic : process.env.MNEMONIC, providerOrUrl : `https://goerli.infura.io/v3/${process.env.INFURA_APIKEY}`, addressIndex: 2}),
+    //   network_id: 5,
+    //   gas: 4465030,
+    //   gasPrice: 10000000000,
+    //  }
+    rinkeby: {
+      provider: () => new HDWalletProvider({ mnemonic : process.env.MNEMONIC, providerOrUrl : `https://rinkeby.infura.io/v3/${process.env.INFURA_APIKEY}`, addressIndex: 1}),
+      network_id: 4,
       gas: 4465030,
       gasPrice: 10000000000,
-     }
+    }
   },
 
   // Set default mocha options here, use special reporters etc.

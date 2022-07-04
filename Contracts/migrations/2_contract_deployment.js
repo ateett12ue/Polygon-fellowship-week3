@@ -2,7 +2,6 @@ const Coin = artifacts.require("StableCoinToken");
 const Oracle = artifacts.require("Oracle"); 
 const ChainlinkOracle = artifacts.require("PriceConsumer"); 
 const Vault = artifacts.require("Vault"); 
-
 module.exports = async function (deployer) {
   await deployer.deploy(Coin, "ONN Stable", "ONN");
   const coin = await Coin.deployed();

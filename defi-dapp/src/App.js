@@ -1,14 +1,15 @@
 import './App.css';
 import React, {useEffect, useState} from "react"
-import contract from "./Abi/valut.json"
+import contractAbi from "./Abi/valut.json"
 import {ethers} from "ethers"
 function App() {
   const [account, setAccount] = useState("");
   const [deposit, setDeposit] = useState("");
-  const [withdraw, setWithdraw] = useState("")
-  const contractAddress = "0x8Aa0403017Cfd038475A54CBD36d6754B1446545"
-  const abi = contract.abi;
-
+  const [withdraw, setWithdraw] = useState("0.001")
+  const [ethPrice, setEthPrice] = useState(-1);
+  const contractAddress = "0x0d6712258223eeecb587ecC101eCA75277Ea190e"
+  const abi = contractAbi.abi;
+  const { ethereum } = window;
   useEffect(() => {
     checkForConnection();
   }, [])
@@ -27,7 +28,6 @@ function App() {
       }
   }
   const checkForConnection = async() => {
-    const { ethereum } = window;
       if (!ethereum) {
         alert("Wallet not present");
         return;
@@ -47,32 +47,25 @@ function App() {
   const handleDeposit = async (event) => {
     event.preventDefault();
     const res = await depositEth();
-    console.log(res);
+    console.log('handleDeposit',res);
   }
 
   const handleWithdraw = async (event) => {
     event.preventDefault();
 
     const res = await withdrawEth();
-    console.log(res);
+    console.log('handleWithdraw',res);
   }
 
   const withdrawEth = async () => {
     try {
-      const { ethereum } = window;
-
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, abi, signer);
         const amt = ethers.utils.parseEther(withdraw);
-        
-        const lendContract = new ethers.Contract(contractAddress, abi, signer);
-        const waveTxn = await lendContract.withdraw(amt.toString(), {value: amt, gasLimit: 30000});
-        console.log("Mining...", waveTxn.hash);
-
-        await waveTxn.wait();
-        console.log("Mined -- ", waveTxn.hash);
-
+        const Txn = await contract.withdraw({gasLimit: 300000});
+        await Txn.wait();
       } else {
         console.log("Ethereum object doesn't exist!");
       }
@@ -83,25 +76,19 @@ function App() {
 
   const depositEth = async () => {
     try {
-      const { ethereum } = window;
       if (ethereum) {
         const provider = new ethers.providers.Web3Provider(ethereum);
         const signer = provider.getSigner();
+        const contract = new ethers.Contract(contractAddress, abi, signer);
         const amt = ethers.utils.parseEther(deposit);
-        
-        console.log(amt.toString());
-        const lendContract = new ethers.Contract(contractAddress, abi, signer);
-        console.log("!!" + deposit);
-        const waveTxn = await lendContract.deposit(amt.toString(), {value: amt, gasLimit: 30000});
-        console.log("Mining...", waveTxn.hash);
-        await waveTxn.wait();
-        console.log("Mined -- ", waveTxn.hash);
+        const Txn = await contract.deposit(amt.toString(), {value: amt, gasLimit: 300000});
+        await Txn.wait();
 
       } else {
         console.log("Ethereum object doesn't exist!");
       }
     } catch (error) {
-      console.log(error)
+      console.log("error", error);
     }
   }
 
@@ -111,6 +98,7 @@ function App() {
         <div className="header">
          Decentralised Financing
         </div>
+        <br/>
 
         {!account ? (
           <button className="connecButton" onClick={connectWallet}>
@@ -125,7 +113,7 @@ function App() {
         <form onSubmit={handleDeposit}>
           <div className='formItems'>
           <div className='form'>
-            <div className='label'>Enter amount of ETH (in wei) to deposit:</div>
+            <div className='label'>Enter amount of ETH to deposit:</div>
             <input
             className='input'
               type="number" 
@@ -143,13 +131,6 @@ function App() {
         <div className='formItems'>
         <div className='form'>
         <div className='label'> Withdraw deposit</div>
-            <input
-              className='input'
-              type="number" 
-              value={withdraw}
-              onChange={(e) => setWithdraw(e.target.value)}
-              step="any"
-            />
           </div>
           <input type="submit" className='button'/>
           </div>
